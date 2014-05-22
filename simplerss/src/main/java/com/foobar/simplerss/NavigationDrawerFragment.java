@@ -1,5 +1,7 @@
 package com.foobar.simplerss;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.support.v7.app.ActionBarActivity;;
 import android.app.Activity;
 import android.support.v7.app.ActionBar;
@@ -19,8 +21,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
+
+import java.util.HashSet;
+import java.util.Set;
+import java.util.prefs.Preferences;
+
 
 /**
  * Fragment used for managing interactions for and presentation of a navigation drawer.
@@ -33,6 +41,11 @@ public class NavigationDrawerFragment extends Fragment {
      * Remember the position of the selected item.
      */
     private static final String STATE_SELECTED_POSITION = "selected_navigation_drawer_position";
+
+    /**
+     * Shared Preferences file name for feed urls
+     */
+    private static final String PREF_FEEDS_KEY = "feeds";
 
     /**
      * Per the design guidelines, you should show the drawer on launch until the user manually
@@ -247,12 +260,56 @@ public class NavigationDrawerFragment extends Fragment {
             return true;
         }
 
-        if (item.getItemId() == R.id.action_example) {
-            Toast.makeText(getActivity(), "Example action.", Toast.LENGTH_SHORT).show();
+        if (item.getItemId() == R.id.action_new_feed) {
+            AlertDialog.Builder urlDialog = new AlertDialog.Builder(getActivity());
+
+            urlDialog.setTitle("New Feed");
+            urlDialog.setMessage("Input RSS Feed URL");
+
+            // Set an EditText view to get user input
+            final EditText input = new EditText(getActivity());
+            urlDialog.setView(input);
+
+            urlDialog.setPositiveButton("Ok", new DialogInterface.OnClickListener()
+            {
+                public void onClick(DialogInterface dialog, int whichButton)
+                {
+                    addNewFeed(input.getText().toString());
+                    // Do something with value!
+                }
+            });
+
+            urlDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener()
+            {
+                public void onClick(DialogInterface dialog, int whichButton)
+                {
+                    // Canceled, don't really care what happens here
+                }
+            });
+
+            urlDialog.show();
+            Toast.makeText(getActivity(), "Dialog finished", Toast.LENGTH_SHORT).show();
+
             return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void addNewFeed(String url)
+    {
+        SharedPreferences sp = getActivity().getPreferences(0);
+        Set<String> feeds = sp.getStringSet(PREF_FEEDS_KEY, new HashSet<String>());
+        if (feeds.contains(url))
+        {
+            Toast.makeText(getActivity(), "Already tracking that feed", Toast.LENGTH_SHORT).show();
+        }
+        else
+        {
+            feeds.add(url);
+            sp.edit().putStringSet(PREF_FEEDS_KEY, feeds).apply();
+            Toast.makeText(getActivity(), "Added feed: " + url, Toast.LENGTH_SHORT).show();
+        }
     }
 
     /**

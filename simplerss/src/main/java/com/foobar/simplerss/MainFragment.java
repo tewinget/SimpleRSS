@@ -48,7 +48,7 @@ public class MainFragment extends Fragment
         listView.setAdapter(new ArrayAdapter<String>(
                 getActivity(),
                 R.layout.feed_entry,
-                R.id.feedEntryText,
+                R.id.feedEntryTitle,
                 new String[]{
                         "Item 1",
                         "Item 2",
