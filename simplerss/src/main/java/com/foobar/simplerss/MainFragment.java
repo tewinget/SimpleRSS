@@ -23,16 +23,16 @@ public class MainFragment extends Fragment
      * The fragment argument representing the section number for this
      * fragment.
      */
-    private static final String ARG_SECTION_NUMBER = "section_number";
+    private static final String ARG_FEED_TITLE = "feed_title";
 
     /**
      * Returns a new instance of this fragment for the given section
      * number.
      */
-    public static MainFragment newInstance(int sectionNumber) {
+    public static MainFragment newInstance(String feedTitle) {
         MainFragment fragment = new MainFragment();
         Bundle args = new Bundle();
-        args.putInt(ARG_SECTION_NUMBER, sectionNumber);
+        args.putString(ARG_FEED_TITLE, feedTitle);
         fragment.setArguments(args);
         return fragment;
     }
@@ -61,6 +61,6 @@ public class MainFragment extends Fragment
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         ((MainActivity) activity).onSectionAttached(
-                getArguments().getInt(ARG_SECTION_NUMBER));
+                getArguments().getString(ARG_FEED_TITLE));
     }
 }
