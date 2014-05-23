@@ -14,4 +14,14 @@
         android:id="@+id/entriesListView"
         android:layout_centerHorizontal="true"
         android:layout_alignParentTop="true"/>
+
+    <ProgressBar
+        style="?android:attr/progressBarStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/progressBar"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:visibility="invisible"/>
+
 </RelativeLayout>
