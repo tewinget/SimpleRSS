@@ -7,6 +7,11 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
 
 /**
  * Created by tom on 5/22/14.
@@ -42,15 +47,38 @@ public class HttpTask extends AsyncTask<String, Void, String>
     @Override
     protected String doInBackground(String... params)
     {
+        URL url = null;
+        BufferedReader reader;
+        StringBuilder stringBuilder;
+
         mUrl = params[0];
+
         try
         {
-            Thread.sleep(2000);
-        } catch (InterruptedException e)
+            url = new URL(mUrl);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+            connection.setRequestMethod("GET");
+            connection.setReadTimeout(5 * 1000);
+            connection.connect();
+
+            reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            stringBuilder = new StringBuilder();
+
+            String line = null;
+            while ((line = reader.readLine()) != null)
+            {
+                stringBuilder.append(line + "\n");
+            }
+
+            return stringBuilder.toString();
+        }
+        catch (Exception e)
         {
             e.printStackTrace();
+            return "";
         }
-        return "foobar";
+
     }
 
     @Override

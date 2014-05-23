@@ -324,6 +324,11 @@ public class NavigationDrawerFragment extends Fragment {
 
     public void onValidateComplete(String url, String result)
     {
+        if (result == null || result == "")
+        {
+            invalidFeedUrl();
+            return;
+        }
         addNewFeed(url);
         onFetchComplete(url, result);
     }
@@ -355,6 +360,11 @@ public class NavigationDrawerFragment extends Fragment {
     private void alreadyTracking()
     {
         Toast.makeText(getActivity(), "Already tracking that feed", Toast.LENGTH_SHORT).show();
+    }
+
+    private void invalidFeedUrl()
+    {
+        Toast.makeText(getActivity(), "Invalid Feed URL", Toast.LENGTH_SHORT).show();
     }
 
     /**
