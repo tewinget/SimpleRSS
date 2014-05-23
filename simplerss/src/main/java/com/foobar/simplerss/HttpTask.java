@@ -1,6 +1,7 @@
 package com.foobar.simplerss;
 
 import android.app.Activity;
+import android.app.Fragment;
 import android.os.AsyncTask;
 import android.view.View;
 import android.widget.ProgressBar;
@@ -12,19 +13,27 @@ import android.widget.Toast;
  */
 public class HttpTask extends AsyncTask<String, Void, String>
 {
+
+    public static final int MODE_VALIDATE = 1;
+    public static final int MODE_GET = 0;
+
     private ProgressBar progressBar;
 
-    private Activity mActivity;
+    private String mUrl;
 
-    HttpTask(Activity activity)
+    private NavigationDrawerFragment mFragment;
+    private int mMode = MODE_GET;
+
+    HttpTask(NavigationDrawerFragment fragment, int mode)
     {
-        mActivity = activity;
+        mMode = mode;
+        mFragment = fragment;
     }
 
     @Override
     protected void onPreExecute()
     {
-        progressBar = (ProgressBar) mActivity.findViewById(R.id.progressBar);
+        progressBar = (ProgressBar) mFragment.getActivity().findViewById(R.id.progressBar);
 
         progressBar.setVisibility(View.VISIBLE);
 
@@ -33,6 +42,7 @@ public class HttpTask extends AsyncTask<String, Void, String>
     @Override
     protected String doInBackground(String... params)
     {
+        mUrl = params[0];
         try
         {
             Thread.sleep(2000);
@@ -52,7 +62,17 @@ public class HttpTask extends AsyncTask<String, Void, String>
     @Override
     protected void onPostExecute(String result)
     {
-        Toast.makeText(mActivity, "AsyncTask finished, returned: " + result, Toast.LENGTH_SHORT).show();
+        progressBar = (ProgressBar) mFragment.getActivity().findViewById(R.id.progressBar);
+        progressBar.setVisibility(View.INVISIBLE);
+        if (mMode == MODE_VALIDATE)
+        {
+            mFragment.onValidateComplete(mUrl, result);
+        }
+        else
+        {
+            mFragment.onFetchComplete(mUrl, result);
+        }
+        Toast.makeText(mFragment.getActivity(), "AsyncTask finished, returned: " + result, Toast.LENGTH_SHORT).show();
     }
 }
 

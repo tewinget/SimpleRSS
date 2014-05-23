@@ -282,7 +282,7 @@ public class NavigationDrawerFragment extends Fragment {
             {
                 public void onClick(DialogInterface dialog, int whichButton)
                 {
-                    addNewFeed(input.getText().toString());
+                    validateFeed(input.getText().toString());
                     // Do something with value!
                 }
             });
@@ -304,23 +304,57 @@ public class NavigationDrawerFragment extends Fragment {
         return super.onOptionsItemSelected(item);
     }
 
+    private void validateFeed(String url)
+    {
+        if (!trackingFeed(url))
+        {
+            HttpTask t = new HttpTask(this, HttpTask.MODE_VALIDATE);
+            t.execute(url);
+        }
+        else
+        {
+            alreadyTracking();
+        }
+    }
+
+    public void onFetchComplete(String url, String result)
+    {
+
+    }
+
+    public void onValidateComplete(String url, String result)
+    {
+        addNewFeed(url);
+        onFetchComplete(url, result);
+    }
+
     private void addNewFeed(String url)
+    {
+        SharedPreferences sp = getActivity().getPreferences(0);
+        Set<String> feeds = sp.getStringSet(PREF_FEEDS_KEY, new HashSet<String>());
+
+        feeds.add(url);
+        sp.edit().putStringSet(PREF_FEEDS_KEY, feeds).apply();
+
+        mFeeds.add(url);
+        ((BaseAdapter) mDrawerListView.getAdapter()).notifyDataSetChanged();
+        Toast.makeText(getActivity(), "Added feed: " + url, Toast.LENGTH_SHORT).show();
+    }
+
+    private boolean trackingFeed(String url)
     {
         SharedPreferences sp = getActivity().getPreferences(0);
         Set<String> feeds = sp.getStringSet(PREF_FEEDS_KEY, new HashSet<String>());
         if (feeds.contains(url))
         {
-            Toast.makeText(getActivity(), "Already tracking that feed", Toast.LENGTH_SHORT).show();
+            return true;
         }
-        else
-        {
-            feeds.add(url);
-            sp.edit().putStringSet(PREF_FEEDS_KEY, feeds).apply();
+        return false;
+    }
 
-            mFeeds.add(url);
-            ((BaseAdapter) mDrawerListView.getAdapter()).notifyDataSetChanged();
-            Toast.makeText(getActivity(), "Added feed: " + url, Toast.LENGTH_SHORT).show();
-        }
+    private void alreadyTracking()
+    {
+        Toast.makeText(getActivity(), "Already tracking that feed", Toast.LENGTH_SHORT).show();
     }
 
     /**
